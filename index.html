@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animated SVG Bar Chart</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        svg {
+            cursor: pointer;
+        }
+        
+        #bar {
+            transition: width 1.5s ease-in-out;
+        }
+        
+        #bar:active {
+            fill: #4a90e2;
+        }
+        
+        #percentage {
+            font-size: 16px;
+            font-weight: bold;
+            fill: #333;
+        }
+    </style>
+</head>
+<body>
+    <svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background Rectangle -->
+        <rect 
+            x="50" 
+            y="30" 
+            width="200" 
+            height="40" 
+            fill="#e0e0e0" 
+            rx="10" 
+            ry="10"
+        />
+        
+        <!-- Animated Bar -->
+        <rect 
+            id="bar"
+            x="50" 
+            y="30" 
+            width="0" 
+            height="40" 
+            fill="#2ecc71" 
+            rx="10" 
+            ry="10"
+        />
+        
+        <!-- Percentage Text -->
+        <text 
+            id="percentage" 
+            x="160" 
+            y="55" 
+            text-anchor="middle"
+        >
+            0%
+        </text>
+    </svg>
+
+    <script>
+        // Get SVG elements
+        const bar = document.getElementById('bar');
+        const percentageText = document.getElementById('percentage');
+        const targetPercentage = 75;
+
+        // Animate bar and update text on page load
+        window.addEventListener('load', () => {
+            // Animate bar width
+            bar.setAttribute('width', `${(targetPercentage / 100) * 200}`);
+            
+            // Animate percentage text
+            let currentPercentage = 0;
+            const animationDuration = 1500; 
+            const startTime = performance.now();
+
+            function updatePercentage(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / animationDuration, 1);
+                
+                currentPercentage = Math.round(progress * targetPercentage);
+                percentageText.textContent = `${currentPercentage}%`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(updatePercentage);
+                }
+            }
+
+            requestAnimationFrame(updatePercentage);
+        });
+
+        // Add click interaction to restart animation
+        document.querySelector('svg').addEventListener('click', () => {
+            bar.setAttribute('width', '0');
+            percentageText.textContent = '0%';
+            
+            // Trigger reflow to restart animation
+            void bar.offsetWidth;
+            
+            window.dispatchEvent(new Event('load'));
+        });
+    </script>
+</body>
+</html>
